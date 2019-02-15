@@ -2,21 +2,22 @@
 Constant variables
 ************************************************************************************/
 const url = 'https://randomuser.me/api/?results=12';
-const users = [];
+const gallery = document.getElementById('gallery');
 
 /************************************************************************************
 Fetch function
 ************************************************************************************/
 fetch(url)
     .then(response => response.json())
-    .then(data => users.push(...data.results));
+    .then(data => data.results.map(user => formatCard(extractInformation(user))))
+    .then(data => gallery.innerHTML = data.join(""));
 
 /************************************************************************************
-Utility function
+Utility functions
 ************************************************************************************/
 const extractInformation = object => (
     {
-        picture: object.picture.thumbnail,
+        picture: object.picture.large,
         firstName: object.name.first,
         lastName: object.name.last,
         email: object.email,
