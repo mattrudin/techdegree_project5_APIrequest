@@ -1,16 +1,17 @@
 /************************************************************************************
-Constant variables
-************************************************************************************/
+ Constant variables
+ ************************************************************************************/
 const url = 'https://randomuser.me/api/?results=12';
 const gallery = document.getElementById('gallery');
 
 /************************************************************************************
 Fetch function
 ************************************************************************************/
-fetch(url)
+const fetchData = url => (
+    fetch(url)
     .then(response => response.json())
-    .then(data => data.results.map(user => formatCard(extractInformation(user))))
-    .then(data => gallery.innerHTML = data.join(""));
+    .then(data => data.results)
+)
 
 /************************************************************************************
 Utility functions
@@ -61,3 +62,10 @@ const formatModal = object => (`
         </div>
     </div>
 `)
+
+/************************************************************************************
+Display functions
+************************************************************************************/
+fetchData(url)
+    .then(data => data.map(user => formatCard(extractInformation(user))))
+    .then(data => gallery.innerHTML = data.join(""));
