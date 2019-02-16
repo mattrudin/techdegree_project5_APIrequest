@@ -3,6 +3,7 @@
  ************************************************************************************/
 const url = 'https://randomuser.me/api/?results=12';
 const gallery = document.getElementById('gallery');
+const body = document.body;
 const galleryArray = [];
 const modalArray = [];
 
@@ -20,8 +21,9 @@ const fetchData = url => (
 /************************************************************************************
 Utility functions
 ************************************************************************************/
-const extractInformation = object => (
+const extractInformation = (object, index) => (
     {
+        id: index,
         picture: object.picture.large,
         firstName: object.name.first,
         lastName: object.name.last,
@@ -37,7 +39,7 @@ const extractInformation = object => (
 )
 
 const formatCard = object => (`
-    <div class="card">
+    <div class="card" id="${object.id}">
         <div class="card-img-container">
             <img class="card-img" src=${object.picture} alt="profile picture">
         </div>
@@ -69,10 +71,18 @@ const formatModal = object => (`
 
 const checkStatus = response => response.ok ? Promise.resolve(response) : Promise.reject(new Error(response.statusText));
 
-const saveUsers = user => {
-    const information = extractInformation(user);
+const saveUsers = (user, index) => {
+    const information = extractInformation(user, index);
     galleryArray.push(formatCard(information));
     modalArray.push(formatModal(information));
+}
+
+const closeButtonFunction = () => {
+    const closeButton = document.getElementById('modal-close-btn');
+    closeButton.addEventListener('click', () => {
+        const modal = document.getElementsByClassName('modal-container')[0];
+        body.removeChild(modal);
+    })
 }
 
 /************************************************************************************
@@ -80,14 +90,23 @@ Display functions
 ************************************************************************************/
 const updateGallery = url => {
     fetchData(url)
-        .then(data => data.map(user => saveUsers(user)))
+        .then(data => data.map((user, index) => saveUsers(user, index)))
         .then(() => gallery.innerHTML = galleryArray.join(""));
+}
+
+const updateModal = html => {
+    body.insertAdjacentHTML('beforeend', html);;
 }
 
 /************************************************************************************
 Event listeners
 ************************************************************************************/
-//gallery.addEventListener('click', )
+gallery.addEventListener('click', event => {
+    if (event.target !== event.currentTarget) {
+        updateModal(modalArray[0]);
+        closeButtonFunction();
+    }
+})
 
 /************************************************************************************
 Main
