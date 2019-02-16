@@ -1,15 +1,25 @@
 /************************************************************************************
- Constant variables
+ Global variables / constants
  ************************************************************************************/
+// URL to the API endpoint
 const url = 'https://randomuser.me/api/?results=12';
+
+// variables for the document elements
 const gallery = document.getElementById('gallery');
 const body = document.body;
+
+// Arrays for the fetched and formated data
 const galleryArray = [];
 const modalArray = [];
 
 /************************************************************************************
 Fetch function
 ************************************************************************************/
+/**
+ * Fetch function with status check and error handling
+ * @param {string} url String for data fetching
+ * @returns {Array} Array with the fetched data
+ */
 const fetchData = url => (
     fetch(url)
     .then(checkStatus)
@@ -21,6 +31,12 @@ const fetchData = url => (
 /************************************************************************************
 Utility functions
 ************************************************************************************/
+/**
+ * Extracts the important information from the fetched data
+ * @param {Object} object User object from fetched data
+ * @param {integer} index 
+ * @returns {Object} With important information for further application
+ */
 const extractInformation = (object, index) => (
     {
         id: index,
@@ -31,13 +47,17 @@ const extractInformation = (object, index) => (
         cellphone: object.cell,
         birthday: object.dob.date,
         city: object.location.city,
-        state: object.location.state,
         postcode: object.location.postcode,
         street: object.location.street,
         nation: object.nat,
     }
 )
 
+/**
+ * Formats the card view with the given information
+ * @param {Object} object 
+ * @returns {HTML}
+ */
 const formatCard = object => (`
     <div class="card" id="${object.id}">
         <div class="card-img-container">
@@ -46,11 +66,16 @@ const formatCard = object => (`
         <div class="card-info-container">
             <h3 id="name" class="card-name cap">${object.firstName} ${object.lastName}</h3>
             <p class="card-text">${object.email}</p>
-            <p class="card-text cap">${object.city}, ${object.state}</p>
+            <p class="card-text cap">${object.city}</p>
         </div>
     </div>
 `)
 
+/**
+ * Formats the modal view with the given information
+ * @param {Object} object 
+ * @returns {HTML}
+ */
 const formatModal = object => (`
     <div class="modal-container">
         <div class="modal">
@@ -62,21 +87,36 @@ const formatModal = object => (`
                 <p class="modal-text cap">${object.city}</p>
                 <hr>
                 <p class="modal-text">${object.cellphone}</p>
-                <p class="modal-text">${object.street}, ${object.state}, ${object.nation} ${object.postcode}</p>
+                <p class="modal-text cap">${object.street}, ${object.nation} ${object.postcode}</p>
                 <p class="modal-text">Birthday: ${new Date(Date.parse(object.birthday)).toLocaleDateString("en-US")}</p>
             </div>
         </div>
     </div>
 `)
 
+/**
+ * Utility function for the fetch function to check the promise status
+ * @param {Promise} response
+ * @returns {Promise} 
+ */
 const checkStatus = response => response.ok ? Promise.resolve(response) : Promise.reject(new Error(response.statusText));
 
+/**
+ * Formats and saves the fetched users to the given arrays 
+ * @param {Object} user 
+ * @param {integer} index 
+ * @returns {void}
+ */
 const saveUsers = (user, index) => {
     const information = extractInformation(user, index);
     galleryArray.push(formatCard(information));
     modalArray.push(formatModal(information));
 }
 
+/**
+ * Adds a close button with function to the modal view
+ * @returns {void}
+ */
 const closeButtonFunction = () => {
     const closeButton = document.getElementById('modal-close-btn');
     closeButton.addEventListener('click', () => {
@@ -85,6 +125,11 @@ const closeButtonFunction = () => {
     })
 }
 
+/**
+ * Gets the id of the card view
+ * @param {event} element
+ * @returns {integer} 
+ */
 const getID = element => {
     let id = "";
     if(element.className.includes('card-text') 
@@ -103,12 +148,22 @@ const getID = element => {
 /************************************************************************************
 Display functions
 ************************************************************************************/
+/**
+ * Shows the fetched users
+ * @param {String} url 
+ * @returns {void}
+ */
 const updateGallery = url => {
     fetchData(url)
         .then(data => data.map((user, index) => saveUsers(user, index)))
         .then(() => gallery.innerHTML = galleryArray.join(""));
 }
 
+/**
+ * Shows the modal view
+ * @param {HTML} html html-string of the modal
+ * @returns {void}
+ */
 const showModal = html => {
     body.insertAdjacentHTML('beforeend', html);;
 }
@@ -116,6 +171,10 @@ const showModal = html => {
 /************************************************************************************
 Event listeners
 ************************************************************************************/
+/**
+ * Eventlistener for each user card
+ * @returns {void}
+ */
 gallery.addEventListener('click', event => {
     if (event.target !== event.currentTarget) {
         let id = getID(event.target);
