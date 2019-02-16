@@ -85,6 +85,21 @@ const closeButtonFunction = () => {
     })
 }
 
+const getID = element => {
+    let id = "";
+    if(element.className.includes('card-text') 
+        || element.className.includes('card-name')
+        || element.className === 'card-img') {
+        id = element.parentElement.parentElement.id;
+    } else if (element.className.includes('card-img-container')
+        || element.className.includes('card-info')) {
+        id = element.parentElement.id;
+    } else {
+        id = element.id;
+    }
+    return id;
+}
+
 /************************************************************************************
 Display functions
 ************************************************************************************/
@@ -94,7 +109,7 @@ const updateGallery = url => {
         .then(() => gallery.innerHTML = galleryArray.join(""));
 }
 
-const updateModal = html => {
+const showModal = html => {
     body.insertAdjacentHTML('beforeend', html);;
 }
 
@@ -103,7 +118,8 @@ Event listeners
 ************************************************************************************/
 gallery.addEventListener('click', event => {
     if (event.target !== event.currentTarget) {
-        updateModal(modalArray[0]);
+        let id = getID(event.target);
+        showModal(modalArray[id]);
         closeButtonFunction();
     }
 })
