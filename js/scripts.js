@@ -3,6 +3,8 @@
  ************************************************************************************/
 const url = 'https://randomuser.me/api/?results=12';
 const gallery = document.getElementById('gallery');
+const galleryArray = [];
+const modalArray = [];
 
 /************************************************************************************
 Fetch function
@@ -67,13 +69,19 @@ const formatModal = object => (`
 
 const checkStatus = response => response.ok ? Promise.resolve(response) : Promise.reject(new Error(response.statusText));
 
+const saveUsers = user => {
+    const information = extractInformation(user);
+    galleryArray.push(formatCard(information));
+    modalArray.push(formatModal(information));
+}
+
 /************************************************************************************
 Display functions
 ************************************************************************************/
 const updateGallery = url => {
     fetchData(url)
-        .then(data => data.map(user => formatCard(extractInformation(user))))
-        .then(data => gallery.innerHTML = data.join(""));
+        .then(data => data.map(user => saveUsers(user)))
+        .then(() => gallery.innerHTML = galleryArray.join(""));
 }
 
 /************************************************************************************
