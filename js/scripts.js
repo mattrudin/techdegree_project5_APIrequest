@@ -9,8 +9,10 @@ Fetch function
 ************************************************************************************/
 const fetchData = url => (
     fetch(url)
+    .then(checkStatus)
     .then(response => response.json())
     .then(data => data.results)
+    .catch(error => alert(`Unfortunately there was an error: ${error}`))
 )
 
 /************************************************************************************
@@ -63,9 +65,23 @@ const formatModal = object => (`
     </div>
 `)
 
+const checkStatus = response => response.ok ? Promise.resolve(response) : Promise.reject(new Error(response.statusText));
+
 /************************************************************************************
 Display functions
 ************************************************************************************/
-fetchData(url)
-    .then(data => data.map(user => formatCard(extractInformation(user))))
-    .then(data => gallery.innerHTML = data.join(""));
+const updateGallery = url => {
+    fetchData(url)
+        .then(data => data.map(user => formatCard(extractInformation(user))))
+        .then(data => gallery.innerHTML = data.join(""));
+}
+
+/************************************************************************************
+Event listeners
+************************************************************************************/
+//gallery.addEventListener('click', )
+
+/************************************************************************************
+Main
+************************************************************************************/
+updateGallery(url);
